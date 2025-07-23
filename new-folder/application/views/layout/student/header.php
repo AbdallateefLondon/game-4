@@ -375,6 +375,16 @@ if ($role == 'student' || $role == 'parent') {
                             <li class="treeview <?php echo set_Topmenu('Onlineexam'); ?>"><a href="<?php echo site_url('user/onlineexam'); ?>"><i class="fa fa-rss ftlayer"></i> <span><?php echo $this->lang->line('online_exam'); ?></span></a></li>
                         <?php }?>
 
+                        <!-- Educational Games Section -->
+                        <?php if ($this->rbac->hasPrivilege('play_games', 'can_view')) {?>
+                            <li class="<?php echo set_Topmenu('games'); ?>">
+                                <a href="<?php echo base_url(); ?>gamebuilder/student-games">
+                                    <i class="fa fa-gamepad ftlayer"></i> 
+                                    <span>Educational Games</span>
+                                </a>
+                            </li>
+                        <?php }?>
+
                         <?php if ($this->studentmodule_lib->hasActive('apply_leave')) {?>
                               <li class="<?php echo set_Topmenu('apply_leave'); ?>"><a href="<?php echo base_url(); ?>user/apply_leave"><i class="fa fa-check-square ftlayer"></i> <span><?php echo $this->lang->line('apply_leave'); ?></span></a></li>
                         <?php }?>
