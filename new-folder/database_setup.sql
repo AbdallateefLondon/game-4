@@ -72,8 +72,8 @@ CREATE TABLE `student_points` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 4. Add Game Builder permissions to permission_group table
-INSERT INTO `permission_group` (`name`, `short_code`, `system`, `sort_order`, `is_active`)
-VALUES ('Game Builder', 'game_builder', 0, 100, 1);
+INSERT INTO `permission_group` (`name`, `short_code`, `system`, `is_active`)
+VALUES ('Game Builder', 'game_builder', 0, 1);
 
 -- Get the permission group ID for game_builder
 SET @game_group_id = LAST_INSERT_ID();
@@ -85,8 +85,8 @@ INSERT INTO `permission_category` (`perm_group_id`, `name`, `short_code`, `enabl
 (@game_group_id, 'Student Gaming', 'student_gaming', 1, 0, 0, 0, NOW());
 
 -- 6. Add Student Games permissions to permission_group table
-INSERT INTO `permission_group` (`name`, `short_code`, `system`, `sort_order`, `is_active`)
-VALUES ('Student Games', 'student_games', 0, 101, 1);
+INSERT INTO `permission_group` (`name`, `short_code`, `system`, `is_active`)
+VALUES ('Student Games', 'student_games', 0, 1);
 
 -- Get the permission group ID for student_games
 SET @student_game_group_id = LAST_INSERT_ID();
