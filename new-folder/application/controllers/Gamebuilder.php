@@ -63,6 +63,11 @@ class Gamebuilder extends Admin_Controller
      */
     public function student_games()
     {
+        // Check if student is logged in (from userlogin system)
+        if (!$this->session->userdata('student')) {
+            redirect('userlogin'); // Redirect to student login
+        }
+
         // Students need play_games permission
         if (!$this->rbac->hasPrivilege('play_games', 'can_view')) {
             access_denied();
