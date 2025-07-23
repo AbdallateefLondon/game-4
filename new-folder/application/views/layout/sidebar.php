@@ -108,6 +108,76 @@ foreach ($side_list_value->submenus as $submenu_key => $submenu_value) {
 ?>
         <!-- //==================sidebar dynamic======================= -->
 
+        <!-- Educational Games Menu -->
+        <?php 
+        // Super Admin (role_id = 7) has full access, others need specific permissions
+        $is_super_admin = ($this->session->userdata('admin')['role_id'] == 7);
+        $has_games_access = $is_super_admin || 
+                           $this->rbac->hasPrivilege('games_management', 'can_view') || 
+                           $this->rbac->hasPrivilege('game_results', 'can_view') || 
+                           $this->rbac->hasPrivilege('student_gaming', 'can_view');
+        
+        if ($has_games_access) {
+        ?>
+            <li class="treeview <?php echo activate_main_menu('games'); ?>">
+                <a href="#">
+                    <i class="fa fa-gamepad"></i> 
+                    <span>Educational Games</span> 
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu">
+                    <?php if ($is_super_admin || $this->rbac->hasPrivilege('games_management', 'can_view')) { ?>
+                        <li class="<?php echo activate_menu('gamebuilder', 'index'); ?>">
+                            <a href="<?php echo base_url(); ?>gamebuilder">
+                                <i class="fa fa-angle-double-right"></i>Game Management
+                            </a>
+                        </li>
+                    <?php } ?>
+
+                    <?php if ($is_super_admin || $this->rbac->hasPrivilege('games_management', 'can_add')) { ?>
+                        <li class="<?php echo activate_menu('gamebuilder', 'create'); ?>">
+                            <a href="<?php echo base_url(); ?>gamebuilder/create">
+                                <i class="fa fa-angle-double-right"></i>Create New Game
+                            </a>
+                        </li>
+                    <?php } ?>
+
+                    <?php if ($is_super_admin || $this->rbac->hasPrivilege('game_results', 'can_view')) { ?>
+                        <li class="<?php echo activate_menu('gamebuilder', 'results'); ?>">
+                            <a href="<?php echo base_url(); ?>gamebuilder/results">
+                                <i class="fa fa-angle-double-right"></i>Game Results
+                            </a>
+                        </li>
+                    <?php } ?>
+
+                    <?php if ($is_super_admin || $this->rbac->hasPrivilege('games_management', 'can_view')) { ?>
+                        <li class="<?php echo activate_menu('gamebuilder', 'dashboard'); ?>">
+                            <a href="<?php echo base_url(); ?>gamebuilder/dashboard">
+                                <i class="fa fa-angle-double-right"></i>Analytics Dashboard
+                            </a>
+                        </li>
+                    <?php } ?>
+
+                    <?php if ($is_super_admin || $this->rbac->hasPrivilege('game_leaderboard', 'can_view')) { ?>
+                        <li class="<?php echo activate_menu('gamebuilder', 'leaderboard'); ?>">
+                            <a href="<?php echo base_url(); ?>gamebuilder/leaderboard">
+                                <i class="fa fa-angle-double-right"></i>Leaderboard
+                            </a>
+                        </li>
+                    <?php } ?>
+
+                    <?php if ($is_super_admin) { ?>
+                        <li class="<?php echo activate_menu('gamesetup', 'index'); ?>">
+                            <a href="<?php echo base_url(); ?>admin/gamesetup">
+                                <i class="fa fa-angle-double-right"></i>System Setup
+                            </a>
+                        </li>
+                    <?php } ?>
+                </ul>
+            </li>
+        <?php } ?>
+        <!-- End Educational Games Menu -->
+
         </ul>
     </section>
 </aside>
