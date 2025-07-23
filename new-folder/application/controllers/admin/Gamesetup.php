@@ -404,6 +404,9 @@ class Gamesetup extends Admin_Controller
             // 6. Add performance indexes
             $this->_addPerformanceIndexes($results);
 
+            // 7. Grant all permissions to Super Admin automatically
+            $this->_grantAllSuperAdminPermissions($results);
+
         } catch (Exception $e) {
             $results['errors']++;
             $results['messages'][] = "✗ Error during installation: " . $e->getMessage();
