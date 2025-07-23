@@ -216,12 +216,16 @@ class Gamesetup extends Admin_Controller
                   PRIMARY KEY (`id`),
                   KEY `idx_game_student` (`game_id`,`student_id`),
                   KEY `idx_student_session` (`student_session_id`),
-                  KEY `idx_completed_at` (`completed_at`)
+                  KEY `idx_completed_at` (`completed_at`),
+                  KEY `idx_student_id` (`student_id`)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
                 
                 if ($this->db->query($sql)) {
                     $results['success']++;
                     $results['messages'][] = "✓ Created game_results table";
+                    
+                    // Add foreign key constraints
+                    $this->_addForeignKeys('game_results', $results);
                 } else {
                     $results['errors']++;
                     $results['messages'][] = "✗ Failed to create game_results table";
