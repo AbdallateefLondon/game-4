@@ -240,6 +240,13 @@ class Gamebuilder extends Admin_Controller
      */
     public function submit_game()
     {
+        // Check if student is logged in (from userlogin system)
+        if (!$this->session->userdata('student')) {
+            $this->output->set_status_header(403);
+            echo json_encode(array('status' => 'error', 'message' => 'Not logged in'));
+            return;
+        }
+
         // Students need play_games permission
         if (!$this->rbac->hasPrivilege('play_games', 'can_view')) {
             $this->output->set_status_header(403);
