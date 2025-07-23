@@ -43,7 +43,7 @@ class Educationalgame_model extends CI_Model
             $this->db->where('educational_games.is_active', 1); // Default to active games only
         }
 
-        $this->db->select('educational_games.*, classes.class, sections.section, subjects.name as subject_name, staff.name as creator_name');
+        $this->db->select('educational_games.*, classes.class, sections.section, subjects.name as subject_name, subjects.code as subject_code, staff.name as creator_name, staff.surname as creator_surname, staff.employee_id');
         $this->db->from('educational_games');
         $this->db->join('classes', 'classes.id = educational_games.class_id', 'left');
         $this->db->join('sections', 'sections.id = educational_games.section_id', 'left');
