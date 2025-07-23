@@ -9,6 +9,22 @@ class Gamebuilder extends Admin_Controller
     {
         parent::__construct();
         $this->load->model(array('educationalgame_model', 'gameresult_model', 'studentpoint_model', 'class_model', 'section_model', 'subject_model'));
+        
+        // Define student methods that require student session
+        $student_methods = array('student_games', 'play_game', 'submit_game');
+        
+        // Check session based on method being called
+        if (in_array($this->router->method, $student_methods)) {
+            // Student methods - check student session
+            if (!$this->session->userdata('student')) {
+                redirect('userlogin'); // Redirect to student login
+            }
+        } else {
+            // Admin/Staff methods - check admin session
+            if (!$this->session->userdata('admin')) {
+                access_denied();
+            }
+        }
     }
 
     /**
