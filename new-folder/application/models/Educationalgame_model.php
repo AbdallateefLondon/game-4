@@ -128,7 +128,9 @@ class Educationalgame_model extends CI_Model
             classes.class, 
             sections.section, 
             subjects.name as subject_name,
+            subjects.code as subject_code,
             staff.name as creator_name,
+            staff.surname as creator_surname,
             COUNT(gr.id) as attempts_made
         ');
         $this->db->from('educational_games');
@@ -140,11 +142,16 @@ class Educationalgame_model extends CI_Model
         
         // Games for student's class/section or global games (no class assigned)
         $this->db->group_start();
-        $this->db->where('educational_games.class_id IS NULL OR educational_games.class_id', $student_info['class_id']);
-        $this->db->group_end();
-        
-        $this->db->group_start();
-        $this->db->where('educational_games.section_id IS NULL OR educational_games.section_id', $student_info['section_id']);
+            $this->db->group_start();
+                $this->db->where('educational_games.class_id IS NULL');
+            $this->db->group_end();
+            $this->db->or_group_start();
+                $this->db->where('educational_games.class_id', $student_info['class_id']);
+                $this->db->group_start();
+                    $this->db->where('educational_games.section_id IS NULL');
+                    $this->db->or_where('educational_games.section_id', $student_info['section_id']);
+                $this->db->group_end();
+            $this->db->group_end();
         $this->db->group_end();
         
         $this->db->where('educational_games.is_active', 1);
