@@ -70,6 +70,7 @@ class Gameresult_model extends CI_Model
         $this->db->join('student_session', 'student_session.student_id = students.id AND student_session.session_id = ' . $this->current_session);
         $this->db->join('classes', 'classes.id = student_session.class_id', 'left');
         $this->db->join('sections', 'sections.id = student_session.section_id', 'left');
+        $this->db->join('subjects', 'subjects.id = educational_games.subject_id', 'left');
         $this->db->order_by('game_results.completed_at', 'DESC');
 
         $query = $this->db->get();
