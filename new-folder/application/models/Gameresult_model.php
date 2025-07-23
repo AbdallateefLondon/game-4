@@ -57,8 +57,11 @@ class Gameresult_model extends CI_Model
             students.firstname,
             students.lastname,
             students.admission_no,
+            students.roll_no,
             classes.class,
-            sections.section
+            sections.section,
+            subjects.name as subject_name,
+            subjects.code as subject_code
         ');
         
         $this->db->from('game_results');
