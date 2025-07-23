@@ -1,5 +1,5 @@
 -- Educational Game System Database Tables
--- Execute this SQL to create the required tables
+-- Execute this SQL to create the required tables with proper foreign key relationships
 
 -- 1. Educational Games table - stores game metadata and content
 CREATE TABLE `educational_games` (
@@ -23,7 +23,12 @@ CREATE TABLE `educational_games` (
   KEY `idx_class_section` (`class_id`,`section_id`),
   KEY `idx_created_by` (`created_by`),
   KEY `idx_game_type` (`game_type`),
-  KEY `idx_active` (`is_active`)
+  KEY `idx_active` (`is_active`),
+  KEY `idx_subject` (`subject_id`),
+  CONSTRAINT `fk_educational_games_class` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_educational_games_section` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_educational_games_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_educational_games_staff` FOREIGN KEY (`created_by`) REFERENCES `staff` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 2. Game Results table - stores individual game attempt results
@@ -44,7 +49,10 @@ CREATE TABLE `game_results` (
   KEY `idx_game_student` (`game_id`,`student_id`),
   KEY `idx_student_session` (`student_session_id`),
   KEY `idx_completed_at` (`completed_at`),
-  FOREIGN KEY (`game_id`) REFERENCES `educational_games` (`id`) ON DELETE CASCADE
+  KEY `idx_student_id` (`student_id`),
+  CONSTRAINT `fk_game_results_game` FOREIGN KEY (`game_id`) REFERENCES `educational_games` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_game_results_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_game_results_student_session` FOREIGN KEY (`student_session_id`) REFERENCES `student_session` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 3. Student Points table - tracks overall student gaming progress
@@ -68,7 +76,9 @@ CREATE TABLE `student_points` (
   UNIQUE KEY `unique_student_session` (`student_id`,`student_session_id`),
   KEY `idx_total_points` (`total_points`),
   KEY `idx_current_level` (`current_level`),
-  KEY `idx_last_played` (`last_played`)
+  KEY `idx_last_played` (`last_played`),
+  CONSTRAINT `fk_student_points_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_student_points_student_session` FOREIGN KEY (`student_session_id`) REFERENCES `student_session` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 4. Add Game Builder permissions to permission_group table
@@ -101,3 +111,14 @@ INSERT INTO `permission_category` (`perm_group_id`, `name`, `short_code`, `enabl
 CREATE INDEX `idx_educational_games_class_section_active` ON `educational_games` (`class_id`, `section_id`, `is_active`);
 CREATE INDEX `idx_game_results_student_game` ON `game_results` (`student_id`, `game_id`, `completed_at`);
 CREATE INDEX `idx_student_points_leaderboard` ON `student_points` (`total_points` DESC, `current_level` DESC);
+
+-- 9. Grant all permissions to Super Admin role (role_id = 7)
+INSERT INTO `roles_permissions` (`role_id`, `perm_cat_id`, `can_view`, `can_add`, `can_edit`, `can_delete`, `created_at`)
+SELECT 7, pc.id, pc.enable_view, pc.enable_add, pc.enable_edit, pc.enable_delete, NOW()
+FROM `permission_category` pc
+JOIN `permission_group` pg ON pg.id = pc.perm_group_id
+WHERE pg.short_code IN ('game_builder', 'student_games')
+AND NOT EXISTS (
+    SELECT 1 FROM `roles_permissions` rp 
+    WHERE rp.role_id = 7 AND rp.perm_cat_id = pc.id
+);
