@@ -70,9 +70,11 @@ class Studentpoint_model extends CI_Model
             students.firstname,
             students.lastname,
             students.admission_no,
+            students.roll_no,
             students.image,
             classes.class,
-            sections.section
+            sections.section,
+            student_session.session_id
         ');
         $this->db->from('student_points');
         $this->db->join('students', 'students.id = student_points.student_id');
