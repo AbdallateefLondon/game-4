@@ -256,7 +256,6 @@ class Gamesetup extends Admin_Controller
                     'name' => 'Game Builder',
                     'short_code' => 'game_builder',
                     'system' => 0,
-                    'sort_order' => 100,
                     'is_active' => 1,
                     'created_at' => date('Y-m-d H:i:s')
                 );
