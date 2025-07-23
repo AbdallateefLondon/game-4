@@ -262,6 +262,9 @@ class Gamesetup extends Admin_Controller
                 if ($this->db->query($sql)) {
                     $results['success']++;
                     $results['messages'][] = "✓ Created student_points table";
+                    
+                    // Add foreign key constraints
+                    $this->_addForeignKeys('student_points', $results);
                 } else {
                     $results['errors']++;
                     $results['messages'][] = "✗ Failed to create student_points table";
