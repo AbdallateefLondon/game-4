@@ -328,10 +328,6 @@ class Gamesetup extends Admin_Controller
                     if ($this->db->insert_batch('permission_category', $categories)) {
                         $results['success']++;
                         $results['messages'][] = "✓ Added Game Builder permission categories";
-                        
-                        // Grant all permissions to Super Admin (role_id = 7) automatically
-                        $this->_grantSuperAdminPermissions($game_group_id);
-                        $results['messages'][] = "✓ Granted Game Builder permissions to Super Admin";
                     }
                 } else {
                     $results['errors']++;
@@ -339,11 +335,6 @@ class Gamesetup extends Admin_Controller
                 }
             } else {
                 $results['messages'][] = "- Game Builder permission group already exists";
-                
-                // Still grant Super Admin permissions if they don't exist
-                $existing_group = $existing->row();
-                $this->_grantSuperAdminPermissions($existing_group->id);
-                $results['messages'][] = "✓ Verified Super Admin Game Builder permissions";
             }
 
             // 5. Add Student Games permission group
