@@ -180,12 +180,16 @@ class Gamesetup extends Admin_Controller
                   KEY `idx_class_section` (`class_id`,`section_id`),
                   KEY `idx_created_by` (`created_by`),
                   KEY `idx_game_type` (`game_type`),
-                  KEY `idx_active` (`is_active`)
+                  KEY `idx_active` (`is_active`),
+                  KEY `idx_subject` (`subject_id`)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
                 
                 if ($this->db->query($sql)) {
                     $results['success']++;
                     $results['messages'][] = "✓ Created educational_games table";
+                    
+                    // Add foreign key constraints if tables exist
+                    $this->_addForeignKeys('educational_games', $results);
                 } else {
                     $results['errors']++;
                     $results['messages'][] = "✗ Failed to create educational_games table";
