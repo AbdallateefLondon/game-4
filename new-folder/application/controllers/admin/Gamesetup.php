@@ -432,6 +432,91 @@ class Gamesetup extends Admin_Controller
     }
 
     /**
+     * Add foreign key constraints
+     */
+    private function _addForeignKeys($table_name, &$results)
+    {
+        switch ($table_name) {
+            case 'educational_games':
+                $constraints = array(
+                    "ALTER TABLE `educational_games` ADD CONSTRAINT `fk_educational_games_class` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE",
+                    "ALTER TABLE `educational_games` ADD CONSTRAINT `fk_educational_games_section` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE SET NULL ON UPDATE CASCADE",
+                    "ALTER TABLE `educational_games` ADD CONSTRAINT `fk_educational_games_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE SET NULL ON UPDATE CASCADE",
+                    "ALTER TABLE `educational_games` ADD CONSTRAINT `fk_educational_games_staff` FOREIGN KEY (`created_by`) REFERENCES `staff` (`id`) ON DELETE CASCADE ON UPDATE CASCADE"
+                );
+                break;
+                
+            case 'game_results':
+                $constraints = array(
+                    "ALTER TABLE `game_results` ADD CONSTRAINT `fk_game_results_game` FOREIGN KEY (`game_id`) REFERENCES `educational_games` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                    "ALTER TABLE `game_results` ADD CONSTRAINT `fk_game_results_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                    "ALTER TABLE `game_results` ADD CONSTRAINT `fk_game_results_student_session` FOREIGN KEY (`student_session_id`) REFERENCES `student_session` (`id`) ON DELETE CASCADE ON UPDATE CASCADE"
+                );
+                break;
+                
+            case 'student_points':
+                $constraints = array(
+                    "ALTER TABLE `student_points` ADD CONSTRAINT `fk_student_points_student` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE ON UPDATE CASCADE",
+                    "ALTER TABLE `student_points` ADD CONSTRAINT `fk_student_points_student_session` FOREIGN KEY (`student_session_id`) REFERENCES `student_session` (`id`) ON DELETE CASCADE ON UPDATE CASCADE"
+                );
+                break;
+                
+            default:
+                return;
+        }
+
+        foreach ($constraints as $constraint_sql) {
+            try {
+                if ($this->db->query($constraint_sql)) {
+                    $results['success']++;
+                    $results['messages'][] = "✓ Added foreign key constraint for $table_name";
+                } else {
+                    $results['messages'][] = "- Foreign key constraint for $table_name already exists or failed to create";
+                }
+            } catch (Exception $e) {
+                $results['messages'][] = "- Foreign key constraint for $table_name: " . $e->getMessage();
+            }
+        }
+    }
+
+    /**
+     * Grant all game permissions to Super Admin automatically
+     */
+    private function _grantAllSuperAdminPermissions(&$results)
+    {
+        // Get all game-related permission categories
+        $this->db->select('pc.id, pc.enable_view, pc.enable_add, pc.enable_edit, pc.enable_delete');
+        $this->db->from('permission_category pc');
+        $this->db->join('permission_group pg', 'pg.id = pc.perm_group_id');
+        $this->db->where_in('pg.short_code', array('game_builder', 'student_games'));
+        $categories = $this->db->get()->result_array();
+
+        foreach ($categories as $category) {
+            // Check if permission already exists for Super Admin (role_id = 7)
+            $this->db->where('role_id', 7);
+            $this->db->where('perm_cat_id', $category['id']);
+            $existing = $this->db->get('roles_permissions');
+
+            if ($existing->num_rows() == 0) {
+                $permission_data = array(
+                    'role_id' => 7,
+                    'perm_cat_id' => $category['id'],
+                    'can_view' => $category['enable_view'],
+                    'can_add' => $category['enable_add'],
+                    'can_edit' => $category['enable_edit'],
+                    'can_delete' => $category['enable_delete'],
+                    'created_at' => date('Y-m-d H:i:s')
+                );
+
+                if ($this->db->insert('roles_permissions', $permission_data)) {
+                    $results['success']++;
+                    $results['messages'][] = "✓ Granted Super Admin permission for category ID: " . $category['id'];
+                }
+            }
+        }
+    }
+
+    /**
      * Grant permissions to Super Admin
      */
     private function _grantSuperAdminPermissions($permission_group_id)
