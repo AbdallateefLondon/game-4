@@ -329,7 +329,6 @@ class Gamesetup extends Admin_Controller
                     'name' => 'Student Games',
                     'short_code' => 'student_games',
                     'system' => 0,
-                    'sort_order' => 101,
                     'is_active' => 1,
                     'created_at' => date('Y-m-d H:i:s')
                 );
