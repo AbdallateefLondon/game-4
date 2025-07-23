@@ -8,6 +8,21 @@ class Gamesetup extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        
+        // Allow access to setup methods without RBAC check for Super Admin
+        $allowed_methods = array('index', 'install', 'uninstall');
+        
+        if (!in_array($this->router->method, $allowed_methods)) {
+            // Only Super Admin can access setup functions
+            if (!$this->session->userdata('admin') || $this->session->userdata('admin')['role_id'] != 7) {
+                access_denied();
+            }
+        } else {
+            // For setup methods, just check if user is Super Admin
+            if (!$this->session->userdata('admin') || $this->session->userdata('admin')['role_id'] != 7) {
+                access_denied();
+            }
+        }
     }
 
     /**
